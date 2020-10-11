@@ -1,9 +1,49 @@
 window.onload = renderTableFromDataIn;
 
 function renderTableFromDataIn(event, selector="#data"){
-    console.log(event);
     var theData = readdata(selector);
-    console.log(theData);
+    console.log({theData});
+    drawTable(theData);
+}
+
+function drawTable(theData){
+    /*inserts a table in the document and inserts thead and tbody
+      into the table
+    */
+    var table = document.createElement('table');
+    document.body.insertAdjacentElement('beforeEnd', table);
+    var thead = document.createElement('thead');
+    table.insertAdjacentElement('afterBegin', thead);
+    var tbody = document.createElement('tbody');
+    table.insertAdjacentElement('beforeEnd', tbody);
+    //this loop puts all the contents of theData into the table
+    while (theData.length > 0){
+	/*
+	  we use currentRow to iterate through the items in theData
+	  array one at a time
+	 */
+	var currentRow = theData.shift();
+	var headOrBody; // where the row will go (thead or tbody)
+	var cellTag; // whether each cell is in a th or a td tag
+	var cells = currentRow.columns;
+	if (currentRow.where == 'thead'){
+	    headOrBody = thead;
+	    cellTag = 'th';
+	} else {
+	    headOrBody = tbody;
+	    cellTag = 'td';
+	}
+	// builds rows
+	var tr = document.createElement('tr');
+	// insert row into headOrBody
+	headOrBody.insertAdjacentElement('beforeEnd', tr);
+	// shift each cell off currentRow and into th or td tags
+	while (cells.length > 0){
+	    var cell = document.createElement(cellTag);
+	    cell.innerText = cells.shift();
+	    tr.insertAdjacentElement('beforeEnd', cell);
+	}
+    }
 }
 
 function readdata(selector){
@@ -35,10 +75,10 @@ function readdata(selector){
      columns takes the first item from the array lines using
      lines.shift and splits it into cells by the tab symbol
      */
-    var rows = [{where: 'THEAD',
+    var rows = [{where: 'thead',
 		 columns: lines.shift().split('\t')}];
     while(lines.length > 0){
-	rows.push({where: 'TBODY',
+	rows.push({where: 'tbody',
 		   columns: lines.shift().split('\t')});
     }
     return rows;
